@@ -1,25 +1,35 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import Boardroom from './pages/boardroom';
+import Login from './pages/login';
+import Client from './providers/client';
+import Loading from './components/loading';
+import { useUserStore } from './store/auth-user';
 
 function App() {
+  const username = useUserStore((state) => state.username);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Client>
+      {/* <Routes>
+        <Route
+          path="/"
+          element={username ? <Boardroom /> : <Navigate to="/login" replace />}
+        />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/:element"
+          element={username ? <Boardroom /> : <Navigate to="/login" replace />}
+        />
+        <Route path="/loader/loader" element={<Loading />} />
+      </Routes> */}
+      <Routes>
+        <Route path="/" element={<Boardroom />} />
+
+        <Route path="/:element" element={<Boardroom />} />
+        <Route path="/loader/loader" element={<Loading />} />
+      </Routes>
+    </Client>
   );
 }
 
