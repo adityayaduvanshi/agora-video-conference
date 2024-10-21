@@ -5,9 +5,21 @@ import Login from './pages/login';
 import Client from './providers/client';
 import Loading from './components/loading';
 import { useUserStore } from './store/auth-user';
+// import RemoteScreenshare from './pages/screenshare';
+import { useEffect, useState } from 'react';
+import { loadUsername } from './store/auth-user';
+import Boardroom2 from './pages/boardroom2';
 
 function App() {
   const username = useUserStore((state) => state.username);
+  const setUsername = useUserStore((state) => state.setUsername);
+
+  useEffect(() => {
+    const storedUsername = loadUsername();
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, [setUsername]);
 
   return (
     <Client>
@@ -25,8 +37,8 @@ function App() {
       </Routes> */}
       <Routes>
         <Route path="/" element={<Boardroom />} />
-
-        <Route path="/:element" element={<Boardroom />} />
+        <Route path="/screenshare" element={<Boardroom2 />} />
+        {/* <Route path="/:element" element={<Boardroom />} /> */}
         <Route path="/loader/loader" element={<Loading />} />
       </Routes>
     </Client>

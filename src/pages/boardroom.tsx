@@ -1,16 +1,15 @@
-/* eslint-disable jsx-a11y/alt-text */
-
-import AgoraRTC, { useJoin } from 'agora-rtc-react';
-
-import { useEffect, useRef, useState } from 'react';
-
-import { useRTCClient, useClientEvent } from 'agora-rtc-react';
+import AgoraRTC, {
+  useJoin,
+  useRTCClient,
+  useClientEvent,
+} from 'agora-rtc-react';
+import { useEffect, useState } from 'react';
 import Login from './login';
 import { useUserStore } from '../store/auth-user';
 import { MediaControl } from '../components/media-control';
-import LocalUserVideoTrack from '../components/agora/local-camera';
 import LocalUserAudioTrack from '../components/agora/local-audio';
 import RemoteParticipants from '../components/agora/remote-participants';
+import { useChannelStore } from '../store/channel';
 
 const Boardroom = () => {
   const username = useUserStore((state) => state.username);
@@ -20,98 +19,170 @@ const Boardroom = () => {
   const [agoraUid, setAgoraUid] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [screenshareStarted, setScreenshareStarted] = useState(false);
+  // const [currentChannel, setCurrentChannel] = useState(
+  //   process.env.REACT_APP_CHANNEL!
+  // );
+  const { currentChannel, channels, setCurrentChannel, addChannel } =
+    useChannelStore();
 
-  const handleCallingChange = (newValue: boolean) => {
-    setCalling(newValue);
-  };
-  // console.log(rtmClient);
+  // const [channels, setChannels] = useState([
+  //   process.env.REACT_APP_CHANNEL!,
+  //   'Podcast',
+  //   'FOZ',
+  //   'General',
+  //   'Tech Talk',
+  //   'Coffee Break',
+  // ]);
+
   useEffect(() => {
     if (username) {
       setAgoraUid(username);
       setCalling(true);
-
-      setTimeout(() => setLoading(false), 500);
-
-      // remove this in prod
       setLoading(false);
     }
   }, [username]);
 
-  useJoin(
+  const { isLoading, isConnected } = useJoin(
     {
       appid: process.env.REACT_APP_AGORAID!,
-      channel: process.env.REACT_APP_CHANNEL!,
+      channel: currentChannel,
       token: null,
       uid: agoraUid,
     },
-
     calling
   );
 
   const client = useRTCClient();
 
-  useClientEvent(client, 'connection-state-change', (e) => {
-    console.log(e, 'etst');
-    if (e === 'DISCONNECTING') {
+  useClientEvent(client, 'connection-state-change', (state) => {
+    console.log('Connection state changed:', state);
+    if (state === 'DISCONNECTED') {
       localStorage.removeItem('active');
     }
   });
 
-  // console.log(client);
-
-  useClientEvent(client, 'user-joined', (e) => {
-    if (e.uid.toString().includes('ScreenShare')) {
+  useClientEvent(client, 'user-joined', (user) => {
+    if (user.uid.toString().includes('ScreenShare')) {
       setScreenshareStarted(true);
-      return;
     }
-    if (e.uid.toString().includes('vZone')) {
-      console.log('s');
-    } else console.log(e);
-  });
-  useClientEvent(client, 'user-left', (e) => {
-    if (e.uid === 'Screenshare') {
-      // toast.success('Screenshare ended.');
-      setScreenshareStarted(false);
-    } else console.log(e.uid, 'user left');
   });
 
-  AgoraRTC.on('playback-device-changed', (e) => {
-    console.log(e, 'playback device changed');
+  useClientEvent(client, 'user-left', (user) => {
+    if (user.uid === 'Screenshare') {
+      setScreenshareStarted(false);
+    }
   });
-  useClientEvent(client, 'stream-fallback', () => {
-    console.log('stream fallback');
-  });
+
+  // const switchChannel = async (newChannel: string) => {
+  //   try {
+  //     if (client.connectionState === 'CONNECTED') {
+  //       await client.leave();
+  //     }
+  //     setCurrentChannel(newChannel);
+  //     await client.join(
+  //       process.env.REACT_APP_AGORAID!,
+  //       newChannel,
+  //       null,
+  //       agoraUid!
+  //     );
+  //   } catch (error) {
+  //     console.error('Error switching channel:', error);
+  //     // Handle the error appropriately (e.g., show an error message to the user)
+  //   }
+  // };
+  const switchChannel = async (newChannel: string) => {
+    try {
+      if (client.connectionState === 'CONNECTED') {
+        await client.leave();
+      }
+      setCurrentChannel(newChannel);
+      await client.join(
+        process.env.REACT_APP_AGORAID!,
+        newChannel,
+        null,
+        agoraUid!
+      );
+    } catch (error) {
+      console.error('Error switching channel:', error);
+      // Handle the error appropriately (e.g., show an error message to the user)
+    }
+  };
+  // const addChannel = (channelName: string) => {
+  //   if (channelName && !channels.includes(channelName)) {
+  //     setChannels((prev) => [...prev, channelName]);
+  //   }
+  // };
+
   if (!username) {
     return <Login />;
   }
 
   return (
-    <div className="step-7 step-6 step-5   h-[100vh] w-[100vw] overflow-hidden  ">
-      <div className="">
-        <div>
-          <RemoteParticipants cameraOn={cameraOn} micOn={micOn} />
-          {/* <LocalUserVideoTrack cameraOn={cameraOn} /> */}
-          <LocalUserAudioTrack micOn={micOn} />
-        </div>
-        {calling && (
-          <div className=" pointer-events-auto  md:relative md:z-[99]">
-            <MediaControl
-              calling={calling}
-              cameraOn={cameraOn}
-              micOn={micOn}
-              setCalling={() => {
-                setCalling((a) => !a);
-              }}
-              setCamera={() => {
-                setCamera((a) => !a);
-              }}
-              setMic={() => {
-                setMic((a) => !a);
-              }}
-            />
+    <div className="h-[100vh] w-[100vw] overflow-hidden">
+      <div>
+        {/* <div>
+          <h2>Current Channel: {currentChannel}</h2>
+          <select
+            value={currentChannel}
+            onChange={(e) => switchChannel(e.target.value)}
+            className="p-2 border rounded"
+          >
+            {channels.map((channel) => (
+              <option key={channel} value={channel}>
+                {channel}
+              </option>
+            ))}
+          </select>
+        </div> */}
+        <div className="absolute top-4 right-4 z-10">
+          <div className="bg-gray-950 rounded-lg shadow-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-white text-sm font-semibold">
+                Current Channel
+              </p>
+              <span className="text-green-400 text-sm font-medium">
+                {currentChannel}
+              </span>
+            </div>
+            <div className="relative">
+              <select
+                value={currentChannel}
+                onChange={(e) => switchChannel(e.target.value)}
+                className="w-full bg-gray-900 text-white border border-gray-600 rounded-md py-1 pl-3 pr-10 appearance-none focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                {channels.map((channel) => (
+                  <option key={channel} value={channel} className="bg-gray-900">
+                    {channel}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                <svg
+                  className="fill-current h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                </svg>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
+        <RemoteParticipants />
+        <LocalUserAudioTrack micOn={micOn} />
       </div>
+      {/* {calling && (
+        <div className="pointer-events-auto md:relative md:z-[99]">
+          <MediaControl
+            calling={calling}
+            cameraOn={cameraOn}
+            micOn={micOn}
+            setCalling={() => setCalling((prev) => !prev)}
+            setCamera={() => setCamera((prev) => !prev)}
+            setMic={() => setMic((prev) => !prev)}
+          />
+        </div>
+      )} */}
     </div>
   );
 };
