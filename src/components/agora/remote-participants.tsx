@@ -6,6 +6,7 @@ import { useCameraStore } from '../../store/camera-store';
 import { RemoteVideoTrack } from 'agora-rtc-react';
 
 import { ChevronLeft, ChevronRight, Mic, MicOff } from 'lucide-react'; // Import icons for pagination buttons
+import { useChannelStore } from '../../store/channel';
 
 const getInitials = (name: string) => {
   const names = name.split(' ');
@@ -97,12 +98,15 @@ const VideoTile = ({
     </div>
   );
 };
-const Videos = () => {
+const RemoteParticipants = ({ channel }: { channel: any }) => {
   const client = useRTCClient();
 
+  const [isLoading, setIsLoading] = useState(true);
   const [remoteUsers, setRemoteUsers] = useState([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 12;
   useEffect(() => {
+    setRemoteUsers([]);
     const handleUserJoined = (user: any) => {
       if (!user.uid.toLowerCase().includes('screenshare')) {
         console.log(`${user.uid} joined the conference`);
@@ -182,9 +186,7 @@ const Videos = () => {
       client.off('user-unpublished', handleUserUnpublished);
       client.off('user-left', handleUserLeft);
     };
-  }, [client]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 12;
+  }, [client, channel]);
 
   // const allUsers = useMemo(() => {
   //   const localUser = { uid: 'You', videoTrack: localCameraTrack };
@@ -324,4 +326,4 @@ const Videos = () => {
   );
 };
 
-export default Videos;
+export default RemoteParticipants;

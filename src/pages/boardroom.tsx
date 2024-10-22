@@ -10,6 +10,7 @@ import { MediaControl } from '../components/media-control';
 import LocalUserAudioTrack from '../components/agora/local-audio';
 import RemoteParticipants from '../components/agora/remote-participants';
 import { useChannelStore } from '../store/channel';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Boardroom = () => {
   const username = useUserStore((state) => state.username);
@@ -67,6 +68,8 @@ const Boardroom = () => {
     }
   });
 
+  const [remoteParticipantsKey, setRemoteParticipantsKey] = useState(0);
+
   useClientEvent(client, 'user-left', (user) => {
     if (user.uid === 'Screenshare') {
       setScreenshareStarted(false);
@@ -90,23 +93,51 @@ const Boardroom = () => {
   //     // Handle the error appropriately (e.g., show an error message to the user)
   //   }
   // };
+  // const switchChannel = async (newChannel: string) => {
+  //   try {
+  //     if (client.connectionState === 'CONNECTED') {
+  //       await client.leave();
+  //     }
+  //     setCurrentChannel(newChannel);
+  //     await client.join(
+  //       process.env.REACT_APP_AGORAID!,
+  //       newChannel,
+  //       null,
+  //       agoraUid!
+  //     );
+  //   } catch (error) {
+  //     console.error('Error switching channel:', error);
+  //     // Handle the error appropriately (e.g., show an error message to the user)
+  //   }
+  // };
+
+  const [refreshKey, setRefreshKey] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
   const switchChannel = async (newChannel: string) => {
     try {
       if (client.connectionState === 'CONNECTED') {
         await client.leave();
       }
       setCurrentChannel(newChannel);
+      setRefreshKey((prev) => prev + 1); // Force re-render of RemoteParticipants
       await client.join(
         process.env.REACT_APP_AGORAID!,
         newChannel,
         null,
         agoraUid!
       );
+      navigate('/refresh', { replace: true });
     } catch (error) {
       console.error('Error switching channel:', error);
-      // Handle the error appropriately (e.g., show an error message to the user)
     }
   };
+
+  useEffect(() => {
+    if (location.pathname === '/refresh') {
+      navigate(location.state?.from || '/', { replace: true });
+    }
+  }, [location, navigate]);
   // const addChannel = (channelName: string) => {
   //   if (channelName && !channels.includes(channelName)) {
   //     setChannels((prev) => [...prev, channelName]);
@@ -168,7 +199,7 @@ const Boardroom = () => {
             </div>
           </div>
         </div>
-        <RemoteParticipants />
+        <RemoteParticipants key={refreshKey} channel={currentChannel} />
         <LocalUserAudioTrack micOn={micOn} />
       </div>
       {calling && (

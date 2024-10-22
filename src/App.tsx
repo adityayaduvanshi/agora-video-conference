@@ -38,6 +38,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Boardroom />} />
         <Route path="/screenshare" element={<Boardroom2 />} />
+        <Route path="/refresh" element={<Navigate to="/" replace />} />
         {/* <Route path="/:element" element={<Boardroom />} /> */}
         <Route path="/loader/loader" element={<Loading />} />
       </Routes>
