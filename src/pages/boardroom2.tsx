@@ -43,7 +43,7 @@ const Boardroom2 = () => {
       appid: process.env.REACT_APP_AGORAID!,
       channel: process.env.REACT_APP_CHANNEL!,
       token: null,
-      uid: agoraUid,
+      uid: `${agoraUid}-screenshare`,
     },
 
     calling

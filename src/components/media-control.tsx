@@ -107,7 +107,7 @@ export const MediaControl = ({
   return (
     <>
       <div className="absolute hidden lg:flex w-full z-50 bottom-10 items-center  justify-center left-0 gap-4 md:z-[99] ">
-        <div className="flex gap-4  ">
+        {/* <div className="flex gap-4  ">
           {setMic && (
             <Button
               variant="roundedbtn"
@@ -149,8 +149,8 @@ export const MediaControl = ({
             </Button>
           )}
 
-          {/* <ParticipantList /> */}
-        </div>
+         
+        </div> */}
 
         {setCalling && (
           <div>

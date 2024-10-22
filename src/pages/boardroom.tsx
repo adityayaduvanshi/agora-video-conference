@@ -171,7 +171,7 @@ const Boardroom = () => {
         <RemoteParticipants />
         <LocalUserAudioTrack micOn={micOn} />
       </div>
-      {/* {calling && (
+      {calling && (
         <div className="pointer-events-auto md:relative md:z-[99]">
           <MediaControl
             calling={calling}
@@ -182,7 +182,7 @@ const Boardroom = () => {
             setMic={() => setMic((prev) => !prev)}
           />
         </div>
-      )} */}
+      )}
     </div>
   );
 };
