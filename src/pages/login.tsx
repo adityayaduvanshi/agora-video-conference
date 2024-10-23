@@ -30,7 +30,11 @@ const Login = () => {
     console.log('clicksssss');
     const buttonText = loginButton2Ref.current?.textContent?.trim() || '';
     console.log('Button text:', buttonText);
-    onLogin();
+    storeUsername(buttonText);
+    setUsername(buttonText);
+    console.log('Logged in as:', buttonText);
+    navigate('/');
+    // onLogin();
   };
 
   return (
