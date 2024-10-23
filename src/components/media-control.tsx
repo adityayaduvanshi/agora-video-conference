@@ -107,8 +107,8 @@ export const MediaControl = ({
   return (
     <>
       <div className="absolute hidden lg:flex w-full z-50 items-center  justify-center  left-0 gap-4 md:z-[99] ">
-        {/* <div className="flex gap-4  ">
-          {setMic && (
+        {/* <div className="flex gap-4  "> */}
+        {/* {setMic && (
             <Button
               variant="roundedbtn"
               className={`step-1 ${
@@ -119,7 +119,7 @@ export const MediaControl = ({
               size="round"
               disabled={disableMic}
               // onClick={() => setMic()}
-              onClick={toggleMic}
+              // onClick={toggleMic}
             >
               {micOn ? (
                 <MicIcon className=" h-5 w-5 " />
@@ -127,9 +127,9 @@ export const MediaControl = ({
                 <MicOff className=" h-5 w-5 " />
               )}
             </Button>
-          )}
+          )} */}
 
-          {setCamera && (
+        {/* {setCamera && (
             <Button
               variant="roundedbtn"
               className={` step-2  focus:outline-none ${
@@ -147,10 +147,8 @@ export const MediaControl = ({
                 <VideoOff className="h-5 w-5" />
               )}
             </Button>
-          )}
-
-         
-        </div> */}
+          )} */}
+        {/* </div> */}
 
         {setCalling && (
           <div>

@@ -1,12 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 
 import { Button } from '../ui/button';
-import { useRTCClient } from 'agora-rtc-react';
+import {
+  IAgoraRTCRemoteUser,
+  RemoteAudioTrack,
+  useRTCClient,
+} from 'agora-rtc-react';
 import { useCameraStore } from '../../store/camera-store';
 import { RemoteVideoTrack } from 'agora-rtc-react';
 
 import { ChevronLeft, ChevronRight, Mic, MicOff } from 'lucide-react'; // Import icons for pagination buttons
 import { useChannelStore } from '../../store/channel';
+import RemoteParticipantsssss from './remote-audio-track';
 
 const getInitials = (name: string) => {
   const names = name.split(' ');
@@ -63,20 +68,26 @@ const VideoTile = ({
   user,
   size,
   isLocal,
+  isSpeaking,
 }: {
   user: any;
   size: string;
   isLocal: boolean;
+  isSpeaking: boolean;
 }) => {
   const initials = getInitials(user.uid);
-
+  console.log(user.audioTrack);
   return (
-    <div className={`relative ${size} bg-black rounded-lg overflow-hidden`}>
+    <div
+      className={`relative ${size} bg-black rounded-lg overflow-hidden ${
+        isSpeaking ? 'border-2 border-green-500 animate-pulse' : ''
+      }`}
+    >
       {user.videoTrack ? (
         <RemoteVideoTrack
           track={user.videoTrack}
           play={true}
-          className="absolute inset-0 h-full w-full object-contain"
+          className="absolute inset-0 h-full w-full object-contain scale-x-[-1]"
         />
       ) : (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -100,15 +111,96 @@ const VideoTile = ({
 };
 const RemoteParticipants = ({ channel }: { channel: any }) => {
   const client = useRTCClient();
+  const [speakingUsers, setSpeakingUsers] = useState<any>({});
 
   const [isLoading, setIsLoading] = useState(true);
-  const [remoteUsers, setRemoteUsers] = useState([]);
+  const [remoteUsers, setRemoteUsers] = useState<IAgoraRTCRemoteUser[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 12;
+  const audioContextRef = useRef<AudioContext | null>(null);
+  // useEffect(() => {
+  //   client.enableAudioVolumeIndicator();
+
+  //   const handleVolumeIndicator = (volumes: any) => {
+  //     const newSpeakingUsers: any = {};
+  //     console.log(volumes);
+  //     volumes.forEach((volume: any) => {
+  //       newSpeakingUsers[volume.uid] = volume.level > 5; // Adjust this threshold as needed
+  //     });
+  //     setSpeakingUsers(newSpeakingUsers);
+  //   };
+  //   console.log(speakingUsers, 'SPEAKING USER');
+  //   client.on('volume-indicator', handleVolumeIndicator);
+
+  //   return () => {
+  //     client.off('volume-indicator', handleVolumeIndicator);
+  //   };
+  // }, [client, speakingUsers]);
+
   useEffect(() => {
-    setRemoteUsers([]);
+    // Create AudioContext in suspended state
+    audioContextRef.current = new (window.AudioContext ||
+      (window as any).webkitAudioContext)();
+    audioContextRef.current.suspend();
+
+    const resumeAudioContext = () => {
+      if (
+        audioContextRef.current &&
+        audioContextRef.current.state === 'suspended'
+      ) {
+        audioContextRef.current
+          .resume()
+          .then(() => {
+            console.log('AudioContext resumed successfully');
+          })
+          .catch((error) => {
+            console.error('Failed to resume AudioContext:', error);
+          });
+      }
+    };
+    document.addEventListener('click', resumeAudioContext);
+    document.addEventListener('touchstart', resumeAudioContext);
+
+    return () => {
+      // Remove event listeners on cleanup
+      document.removeEventListener('click', resumeAudioContext);
+      document.removeEventListener('touchstart', resumeAudioContext);
+      // Close AudioContext on cleanup
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
+  useEffect(() => {
+    client.enableAudioVolumeIndicator();
+
+    const handleVolumeIndicator = (volumes: any) => {
+      const newSpeakingUsers: any = {};
+      volumes.forEach((volume: any) => {
+        const isSpeaking = volume.level > 20; // Adjust this threshold as needed
+        newSpeakingUsers[volume.uid] = isSpeaking;
+
+        // Log when a user starts speaking
+        if (isSpeaking) {
+          console.log(`${volume.uid} is speaking`);
+        }
+      });
+      setSpeakingUsers(newSpeakingUsers);
+    };
+
+    client.on('volume-indicator', handleVolumeIndicator);
+
+    return () => {
+      client.off('volume-indicator', handleVolumeIndicator);
+    };
+  }, [client]);
+  useEffect(() => {
+    // setRemoteUsers([]);
     const handleUserJoined = (user: any) => {
-      if (!user.uid.toLowerCase().includes('screenshare')) {
+      if (
+        !user.uid.toLowerCase().includes('screenshare') &&
+        !user.uid.toLowerCase().includes('vzone')
+      ) {
         console.log(`${user.uid} joined the conference`);
 
         setRemoteUsers((prevUsers: any) => {
@@ -124,7 +216,10 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
       }
     };
     const handleUserPublished = async (user: any, mediaType: any) => {
-      if (!user.uid.toLowerCase().includes('screenshare')) {
+      if (
+        !user.uid.toLowerCase().includes('screenshare') &&
+        !user.uid.toLowerCase().includes('vzone')
+      ) {
         await client.subscribe(user, mediaType);
         console.log(
           `${user.uid} turned on ${
@@ -148,7 +243,10 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     };
 
     const handleUserUnpublished = (user: any, mediaType: any) => {
-      if (!user.uid.toLowerCase().includes('screenshare')) {
+      if (
+        !user.uid.toLowerCase().includes('screenshare') &&
+        !user.uid.toLowerCase().includes('vzone')
+      ) {
         console.log(
           `${user.uid} turned off ${
             mediaType === 'video' ? 'camera' : 'microphone'
@@ -186,7 +284,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
       client.off('user-unpublished', handleUserUnpublished);
       client.off('user-left', handleUserLeft);
     };
-  }, [client, channel]);
+  }, [client]);
 
   // const allUsers = useMemo(() => {
   //   const localUser = { uid: 'You', videoTrack: localCameraTrack };
@@ -294,6 +392,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
                 user={user}
                 size={tileSize}
                 isLocal={false}
+                isSpeaking={speakingUsers[user.uid] || false}
               />
             ))}
           </div>
@@ -321,6 +420,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
             </div>
           )}
         </div>
+        {/* <RemoteParticipantsssss /> */}
       </div>
     </>
   );

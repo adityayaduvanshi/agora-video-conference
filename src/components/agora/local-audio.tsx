@@ -4,31 +4,32 @@ import {
   useLocalMicrophoneTrack,
   usePublish,
 } from 'agora-rtc-react';
-import { useMicrophoneStore } from '../../store/mic-store';
 
 interface LocalUserAudioTrackProps {
   micOn: boolean;
 }
 
 const LocalUserAudioTrack = ({ micOn }: LocalUserAudioTrackProps) => {
-  const { localMicrophoneTrack, isLoading, error } = useLocalMicrophoneTrack(
-    micOn,
-    {}
-  );
+  // const { localMicrophoneTrack, isLoading, error } = useLocalMicrophoneTrack(
+  //   micOn,
+  //   {}
+  // );
 
-  useMicrophoneStore.setState({ localMicrophoneTrack });
-  if (error) {
-    console.log(error);
-  }
+  // useMicrophoneStore.setState({ localMicrophoneTrack });
+  // if (error) {
+  //   toast('Something  went wrong! Please refresh the page', {
+  //     className: ' bg-red-400',
+  //   });
+  // }
 
-  usePublish([localMicrophoneTrack]);
+  // usePublish([localMicrophoneTrack]);
 
-  useEffect(() => {
-    if (localMicrophoneTrack) {
-      localMicrophoneTrack.setMuted(!micOn);
-      localMicrophoneTrack.stop();
-    }
-  }, [micOn, localMicrophoneTrack]);
+  // useEffect(() => {
+  //   if (localMicrophoneTrack) {
+  //     localMicrophoneTrack.setMuted(!micOn);
+  //     localMicrophoneTrack.stop();
+  //   }
+  // }, [micOn, localMicrophoneTrack]);
 
   return (
     <div>

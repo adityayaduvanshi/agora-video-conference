@@ -23,6 +23,7 @@ const Boardroom = () => {
   // const [currentChannel, setCurrentChannel] = useState(
   //   process.env.REACT_APP_CHANNEL!
   // );
+
   const { currentChannel, channels, setCurrentChannel, addChannel } =
     useChannelStore();
 
@@ -132,7 +133,9 @@ const Boardroom = () => {
       console.error('Error switching channel:', error);
     }
   };
-
+  AgoraRTC.on('playback-device-changed', (e) => {
+    console.log(e, 'playback device changed');
+  });
   useEffect(() => {
     if (location.pathname === '/refresh') {
       navigate(location.state?.from || '/', { replace: true });
@@ -199,8 +202,8 @@ const Boardroom = () => {
             </div>
           </div>
         </div>
-        <RemoteParticipants key={refreshKey} channel={currentChannel} />
-        <LocalUserAudioTrack micOn={micOn} />
+        <RemoteParticipants channel={currentChannel} />
+        {/* <LocalUserAudioTrack micOn={micOn} /> */}
       </div>
       {calling && (
         <div className="pointer-events-auto md:relative md:z-[99]">
