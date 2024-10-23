@@ -7,7 +7,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const setUsername = useUserStore((state) => state.setUsername);
   const navigate = useNavigate();
-
+  const loginButton2Ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const savedUsername = loadUsername();
     if (savedUsername) {
@@ -25,6 +25,12 @@ const Login = () => {
     // } else {
     // setError('Please enter a valid name');
     // }
+  };
+  const onLoginButton2Click = () => {
+    console.log('clicksssss');
+    const buttonText = loginButton2Ref.current?.textContent?.trim() || '';
+    console.log('Button text:', buttonText);
+    onLogin();
   };
 
   return (
@@ -82,13 +88,11 @@ const Login = () => {
 
                 <div
                   id="loginButton2"
-                  className=" bg-black text-white py-4 px-2"
-                  onClick={() => {
-                    console.log('clicksssss');
-                    onLogin();
-                  }}
+                  ref={loginButton2Ref}
+                  className="bg-black text-white py-4 px-2"
+                  onClick={onLoginButton2Click}
                 >
-                  Calling login{' '}
+                  Calling login
                 </div>
               </div>
             </div>
