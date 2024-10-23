@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { loadUsername, storeUsername, useUserStore } from '../store/auth-user';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [name, setName] = useState('');
+  const nameRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState('');
   const setUsername = useUserStore((state) => state.setUsername);
   const navigate = useNavigate();
@@ -16,8 +16,9 @@ const Login = () => {
   }, [navigate]);
 
   const onLogin = () => {
-    if (name.trim()) {
-      storeUsername(name.trim());
+    const name = nameRef.current?.value.trim() || '';
+    if (name) {
+      storeUsername(name);
       setUsername(name);
       console.log('Logged in as:', name);
       navigate('/');
@@ -62,8 +63,7 @@ const Login = () => {
                 </h1>
                 <div className="mt-8">
                   <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    ref={nameRef}
                     className="mt-2 w-full rounded-xl border-[1px] border-[#f3f4f6] bg-transparent py-3 px-4 leading-tight text-white placeholder-gray-500 focus:border-green-400 focus:bg-transparent focus:outline-none"
                     id="name"
                     placeholder="Name"
