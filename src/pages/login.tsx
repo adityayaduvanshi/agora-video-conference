@@ -79,6 +79,16 @@ const Login = () => {
                 >
                   Login
                 </button>
+
+                <div
+                  className=" bg-black text-white py-4 px-2"
+                  onClick={() => {
+                    console.log('clicksssss');
+                    onLogin();
+                  }}
+                >
+                  Calling login{' '}
+                </div>
               </div>
             </div>
           </div>
