@@ -17,14 +17,14 @@ const Login = () => {
 
   const onLogin = () => {
     const name = nameRef.current?.value.trim() || '';
-    if (name) {
-      storeUsername(name);
-      setUsername(name);
-      console.log('Logged in as:', name);
-      navigate('/');
-    } else {
-      setError('Please enter a valid name');
-    }
+    // if (name) {
+    storeUsername(name);
+    setUsername(name);
+    console.log('Logged in as:', name);
+    navigate('/');
+    // } else {
+    // setError('Please enter a valid name');
+    // }
   };
 
   return (
