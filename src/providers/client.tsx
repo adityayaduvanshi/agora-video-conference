@@ -13,7 +13,7 @@ export const Client = ({
   clientConfig = { mode: 'live', codec: 'vp8' },
 }: ClientProps) => {
   const [client] = useState(() => AgoraRTC.createClient(clientConfig));
-  AgoraRTC.setLogLevel(4);
+  AgoraRTC.setLogLevel(1);
   AgoraRTC.disableLogUpload();
   return <AgoraRTCProvider client={client}>{children}</AgoraRTCProvider>;
 };

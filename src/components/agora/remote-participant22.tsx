@@ -80,7 +80,7 @@ const VideoTile = ({
   return (
     <div
       className={`relative ${size} bg-black rounded-lg overflow-hidden ${
-        isSpeaking ? 'border-2 border-green-500 ' : ''
+        isSpeaking ? 'border-2 border-green-500 animate-pulse' : ''
       }`}
     >
       {user.videoTrack ? (
@@ -96,14 +96,14 @@ const VideoTile = ({
           </div>
         </div>
       )}
-      <div className="absolute w-full flex justify-center bottom-0 sm:bottom-2 left-2 bg-transparent bg-opacity-50 px-2 py-1 rounded text-white text-xs sm:text-[16px]">
+      <div className="absolute w-full flex justify-center bottom-0 sm:bottom-2 left-2 bg-transparent bg-opacity-50 px-2 py-1 rounded text-white text-xs sm:text-sm">
         {isLocal ? 'You' : user.uid}
       </div>
-      <div className="absolute top-1 right-2">
+      <div className="absolute top-1 right-1">
         {user.audioTrack ? (
-          <Mic className="h-6 w-6text-green-500" />
+          <Mic className="h-5 w-5 text-green-500" />
         ) : (
-          <MicOff className="h-6 w-6 text-red-500" />
+          <MicOff className="h-5 w-5 text-red-500" />
         )}
       </div>
     </div>
@@ -183,8 +183,6 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         // Log when a user starts speaking
         if (isSpeaking) {
           console.log(`${volume.uid} is speaking`);
-        } else {
-          console.log(`${volume.uid} is not speaking`);
         }
       });
       setSpeakingUsers(newSpeakingUsers);
@@ -311,17 +309,16 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   const totalPages = Math.ceil(allUsers.length / usersPerPage);
 
   const getLayoutConfig = (userCount: any) => {
+    const baseClass = 'w-full h-full';
     if (userCount === 1)
       return {
-        containerClass: 'flex items-center justify-center',
-        tileSize: 'w-full h-full max-w-3xl max-h-[calc(100vh-8rem)]',
+        containerClass: 'flex items-center justify-center h-full',
+        tileSize: `${baseClass}  max-h-full`,
       };
     if (userCount === 2)
       return {
-        containerClass:
-          'flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4',
-        tileSize:
-          'w-full sm:w-[calc(50%-0.5rem)] h-[calc((100vh-8rem)/2-0.5rem)] sm:h-[calc(50vw-0.5rem)] sm:max-h-[calc(100vh-8rem)]',
+        containerClass: 'grid grid-cols-1 sm:grid-cols-2 gap-4 h-full',
+        tileSize: baseClass,
       };
     if (userCount === 3)
       return {
