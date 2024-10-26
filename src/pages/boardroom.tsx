@@ -152,7 +152,7 @@ const Boardroom = () => {
   }
 
   return (
-    <div className="h-[100vh] w-[100vw] overflow-hidden">
+    <div className="h-[100vh] bg-black w-[100vw] overflow-hidden">
       <RemoteParticipants channel={currentChannel} />
       <div>
         {/* <div>
