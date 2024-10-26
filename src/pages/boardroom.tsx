@@ -8,7 +8,7 @@ import Login from './login';
 import { useUserStore } from '../store/auth-user';
 import { MediaControl } from '../components/media-control';
 import LocalUserAudioTrack from '../components/agora/local-audio';
-import RemoteParticipants from '../components/agora/remote-participants';
+import RemoteParticipants from '../components/agora/remote-participant22';
 import { useChannelStore } from '../store/channel';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -153,6 +153,7 @@ const Boardroom = () => {
 
   return (
     <div className="h-[100vh] w-[100vw] overflow-hidden">
+      <RemoteParticipants channel={currentChannel} />
       <div>
         {/* <div>
           <h2>Current Channel: {currentChannel}</h2>
@@ -202,10 +203,10 @@ const Boardroom = () => {
             </div>
           </div>
         </div>
-        <RemoteParticipants channel={currentChannel} />
+
         {/* <LocalUserAudioTrack micOn={micOn} /> */}
       </div>
-      {calling && (
+      {/* {calling && (
         <div className="pointer-events-auto md:relative md:z-[99]">
           <MediaControl
             calling={calling}
@@ -216,7 +217,7 @@ const Boardroom = () => {
             setMic={() => setMic((prev) => !prev)}
           />
         </div>
-      )}
+      )} */}
     </div>
   );
 };

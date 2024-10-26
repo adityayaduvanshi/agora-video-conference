@@ -76,35 +76,50 @@ const VideoTile = ({
   isSpeaking: boolean;
 }) => {
   const initials = getInitials(user.uid);
-  console.log(user.audioTrack);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current && user.videoTrack) {
+      user.videoTrack.play(videoRef.current);
+    }
+    return () => {
+      if (user.videoTrack) {
+        user.videoTrack.stop();
+      }
+    };
+  }, [user.videoTrack]);
+
   return (
     <div
       className={`relative ${size} bg-black rounded-lg overflow-hidden ${
-        isSpeaking ? 'border-2 border-green-500 animate-pulse' : ''
+        isSpeaking ? 'border-2 border-green-500' : ''
       }`}
     >
-      {user.videoTrack ? (
-        <RemoteVideoTrack
-          track={user.videoTrack}
-          play={true}
-          className="absolute inset-0 h-full w-full object-contain scale-x-[-1]"
-        />
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center">
+        {user.videoTrack ? (
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full !object-contain scale-x-[-1]"
+          />
+        ) : (
           <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-full flex items-center justify-center bg-transparent border-2 border-green-500 text-white text-2xl sm:text-4xl font-bold">
             {isLocal ? 'You' : initials}
           </div>
-        </div>
-      )}
-      <div className="absolute w-full flex justify-center bottom-0 sm:bottom-2 left-2 bg-transparent bg-opacity-50 px-2 py-1 rounded text-white text-xs sm:text-sm">
-        {isLocal ? 'You' : user.uid}
-      </div>
-      <div className="absolute top-1 right-1">
-        {user.audioTrack ? (
-          <Mic className="h-5 w-5 text-green-500" />
-        ) : (
-          <MicOff className="h-5 w-5 text-red-500" />
         )}
+      </div>
+      <div className="absolute w-full flex justify-center items-center bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent px-2 py-1">
+        <span className="text-white text-xs sm:text-sm">
+          {isLocal ? 'You' : user.uid}
+        </span>
+      </div>
+      <div className="  absolute top-1 right-2">
+        <div className="">
+          {user.audioTrack ? (
+            <Mic className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
+          ) : (
+            <MicOff className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -183,6 +198,8 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         // Log when a user starts speaking
         if (isSpeaking) {
           console.log(`${volume.uid} is speaking`);
+        } else {
+          console.log(`${volume.uid} is not speaking`);
         }
       });
       setSpeakingUsers(newSpeakingUsers);
@@ -199,7 +216,8 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     const handleUserJoined = (user: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
-        !user.uid.toLowerCase().includes('vzone')
+        !user.uid.toLowerCase().includes('vzone') &&
+        !user.uid.toLowerCase().includes('screendev')
       ) {
         console.log(`${user.uid} joined the conference`);
 
@@ -218,7 +236,8 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     const handleUserPublished = async (user: any, mediaType: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
-        !user.uid.toLowerCase().includes('vzone')
+        !user.uid.toLowerCase().includes('vzone') &&
+        !user.uid.toLowerCase().includes('screendev')
       ) {
         await client.subscribe(user, mediaType);
         console.log(
@@ -245,7 +264,8 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     const handleUserUnpublished = (user: any, mediaType: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
-        !user.uid.toLowerCase().includes('vzone')
+        !user.uid.toLowerCase().includes('vzone') &&
+        !user.uid.toLowerCase().includes('screendev')
       ) {
         console.log(
           `${user.uid} turned off ${
@@ -308,65 +328,34 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   }, [allUsers, currentPage]);
   const totalPages = Math.ceil(allUsers.length / usersPerPage);
 
-  const getLayoutConfig = (userCount: any) => {
-    const baseClass = 'w-full h-full';
+  const getLayoutConfig = (userCount: number) => {
+    const baseClass = 'aspect-video'; // This ensures 16:9 aspect ratio
     if (userCount === 1)
       return {
-        containerClass: 'flex items-center justify-center h-full',
-        tileSize: `${baseClass}  max-h-full`,
+        containerClass: 'flex items-center justify-center',
+        tileSize: `${baseClass} w-full max-w-5xl`,
       };
     if (userCount === 2)
       return {
-        containerClass: 'grid grid-cols-1 sm:grid-cols-2 gap-4 h-full',
-        tileSize: baseClass,
+        containerClass:
+          'grid grid-cols-1 justify-center sm:grid-cols-2 gap-2 h-full content-center',
+        tileSize: `${baseClass} w-full`,
       };
-    if (userCount === 3)
+    if (userCount <= 4)
       return {
         containerClass:
-          'flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4',
-        tileSize:
-          'w-full sm:w-[calc(33.33%-0.5rem)] h-[calc((100vh-8rem)/3-0.5rem)] sm:h-[calc(33.33vw-0.5rem)] sm:max-h-[calc(100vh-8rem)]',
+          'grid grid-cols-2 gap-2 max-w-4xl mx-auto h-full content-center  ',
+        tileSize: `${baseClass} w-full`,
       };
-    // if (userCount === 3)
-    //   return {
-    //     containerClass:
-    //       'grid grid-cols-1 sm:grid-cols-3 mx-auto  items-center gap-4',
-
-    //     tileSize:
-    //       ' aspect-square sm:aspect-video h-[calc((100vh-8rem)/3)] sm:gap-2 sm:h-[calc((100vh-8rem)/2)]',
-    //   };
-    if (userCount === 4)
-      return {
-        containerClass: 'grid grid-cols-2 mx-auto  items-center gap-4',
-        tileSize:
-          ' aspect-square sm:aspect-video h-[calc((100vh-8rem)/3)] sm:gap-2 sm:h-[calc((100vh-8rem)/2)]',
-      };
-    if (userCount === 5)
-      return {
-        containerClass:
-          'grid grid-cols-2 sm:grid-cols-3 mx-auto  items-center gap-4',
-        tileSize:
-          ' aspect-square sm:aspect-video h-[calc((100vh-8rem)/4)] sm:gap-2 sm:h-[calc((100vh-12rem)/2)]',
-      };
-    if (userCount === 6)
-      return {
-        containerClass:
-          'grid grid-cols-2 sm:grid-cols-3 mx-auto  items-center gap-4',
-        tileSize:
-          ' aspect-square sm:aspect-video h-[calc((100vh-8rem)/4)] sm:gap-2 sm:h-[calc((100vh-12rem)/2)]',
-      };
-
     if (userCount <= 9)
       return {
         containerClass:
-          'grid grid-cols-2 sm:grid-cols-4 mx-auto  items-center gap-2',
-        tileSize:
-          'aspect-square sm:aspect-video h-[calc((100vh-8rem)/4)] sm:h-[calc((100vh-8rem)/3)]',
+          'grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-5xl mx-auto h-full content-center',
+        tileSize: `${baseClass} w-full`,
       };
-
     return {
-      containerClass: 'grid grid-cols-2 sm:grid-cols-4 sm:gap-4 gap-1',
-      tileSize: 'w-full h-[calc((100vh-8rem)/3)]',
+      containerClass: 'grid grid-cols-2 sm:grid-cols-4 gap-2',
+      tileSize: `${baseClass} w-full`,
     };
   };
 
@@ -381,47 +370,42 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   };
 
   return (
-    <>
-      <div className="  overflow-hidden  w-full h-[calc(100vh-8rem)] p-2 sm:h-[calc(100vh-4rem)]">
-        <div className="flex flex-col h-full overflow-y-auto sm:overflow-hidden">
-          <div className={`${containerClass}  flex-grow`}>
-            {paginatedUsers.map((user: any, index: any) => (
-              <VideoTile
-                key={user.uid}
-                user={user}
-                size={tileSize}
-                isLocal={false}
-                isSpeaking={speakingUsers[user.uid] || false}
-              />
-            ))}
-          </div>
-          {allUsers.length > usersPerPage && (
-            <div className="flex justify-center items-center mt-4 space-x-2 absolute bottom-4 left-1/2 transform -translate-x-1/2">
-              <Button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors duration-200"
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </Button>
-              <span className="text-white text-sm font-medium">
-                {currentPage} / {totalPages}
-              </span>
-              <Button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors duration-200"
-                aria-label="Next page"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </Button>
-            </div>
-          )}
-        </div>
-        {/* <RemoteParticipantsssss /> */}
+    <div className="w-full h-[calc(100vh-8rem)] sm:h-[calc(100vh-4rem)] p-2 overflow-hidden">
+      <div className={`${containerClass} h-full`}>
+        {paginatedUsers.map((user: any, index: any) => (
+          <VideoTile
+            key={user.uid}
+            user={user}
+            size={tileSize}
+            isLocal={false}
+            isSpeaking={speakingUsers[user.uid] || false}
+          />
+        ))}
       </div>
-    </>
+      {allUsers.length > usersPerPage && (
+        <div className="flex justify-center items-center mt-4 space-x-2 absolute bottom-4 left-1/2 transform -translate-x-1/2">
+          <Button
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+            className="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors duration-200"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <span className="text-white text-sm font-medium">
+            {currentPage} / {totalPages}
+          </span>
+          <Button
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+            className="p-2 bg-gray-800 hover:bg-gray-700 text-white rounded-full transition-colors duration-200"
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 
