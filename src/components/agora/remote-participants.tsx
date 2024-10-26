@@ -292,18 +292,18 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   //   const localUser = { uid: 'You', videoTrack: localCameraTrack };
   //   return [localUser, ...remoteUsers];
   // }, [localCameraTrack, remoteUsers]);
-  const allUsers = useMemo(() => {
-    // Remove the local user, just return remoteUsers
-    return remoteUsers;
-  }, [remoteUsers]);
   // const allUsers = useMemo(() => {
-  //   // const localUser = { uid: 'You', videoTrack: localCameraTrack };
-  //   const dummyUsers = Array.from({ length: 9 }, (_, i) => ({
-  //     uid: `User ${i + 1}`,
-  //     videoTrack: null,
-  //   }));
-  //   return [...dummyUsers];
-  // }, []);
+  //   // Remove the local user, just return remoteUsers
+  //   return remoteUsers;
+  // }, [remoteUsers]);
+  const allUsers = useMemo(() => {
+    // const localUser = { uid: 'You', videoTrack: localCameraTrack };
+    const dummyUsers = Array.from({ length: 13 }, (_, i) => ({
+      uid: `User ${i + 1}`,
+      videoTrack: null,
+    }));
+    return [...dummyUsers];
+  }, []);
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * usersPerPage;
     return allUsers.slice(startIndex, startIndex + usersPerPage);

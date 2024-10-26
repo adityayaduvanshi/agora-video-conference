@@ -108,7 +108,7 @@ const VideoTile = ({
         )}
       </div>
       <div className="absolute w-full flex justify-center items-center bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent px-2 py-1">
-        <span className="text-white text-xs sm:text-lg font-semibold">
+        <span className="text-white text-xs sm:text-[1.4rem] font-semibold">
           {isLocal ? 'You' : user.uid}
         </span>
       </div>
