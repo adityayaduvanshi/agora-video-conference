@@ -18,62 +18,19 @@ const getInitials = (name: string) => {
   if (names.length === 1) return names[0].charAt(0).toUpperCase();
   return (names[0].charAt(0) + names[names.length - 1].charAt(0)).toUpperCase();
 };
-// const VideoTile = ({
-//   user,
-//   size,
-//   isLocal,
-// }: {
-//   user: any;
-//   size: any;
-//   isLocal: any;
-// }) => {
-//   const initials = getInitials(user.uid);
-//   const gradientClass = 'bg-gradient-to-r from-green-400 to-blue-500';
-//   // console.log(user);
-//   return (
-//     <div className={`relative ${size} bg-black rounded-lg overflow-hidden`}>
-//       {user.videoTrack ? (
-//         <div
-//           ref={(ref) => {
-//             if (ref) user.videoTrack.play(ref);
-//           }}
-//           className={`absolute inset-0 h-full w-full object-cover ${
-//             !isLocal ? 'scale-x-[-1]' : ''
-//           }`}
-//         />
-//       ) : (
-//         <div className="absolute inset-0 flex items-center justify-center">
-//           <div
-//             className={`w-16 sm:w-24  h-16 sm:h-24 rounded-full flex items-center justify-center   bg-transparent border-2 border-green-500 text-white text-2xl sm:text-4xl  font-bold`}
-//           >
-//             {isLocal ? 'You' : initials}
-//           </div>
-//         </div>
-//       )}
-//       <div className="absolute  w-full flex justify-center bottom-0 sm:bottom-2 left-2 bg-transparent bg-opacity-50 px-2 py-1 rounded text-white text-xs sm:text-sm">
-//         {isLocal ? 'You' : user.uid}
-//       </div>
-//       <div className=" absolute top-1 right-1">
-//         {user.audioTrack ? (
-//           <Mic className="h-5 w-5 text-green-500" />
-//         ) : (
-//           <MicOff className="h-5 w-5 text-red-500" />
-//         )}
-//       </div>
-//     </div>
-//   );
-// };
 
 const VideoTile = ({
   user,
   size,
   isLocal,
   isSpeaking,
+  userCount,
 }: {
   user: any;
   size: string;
   isLocal: boolean;
   isSpeaking: boolean;
+  userCount: number;
 }) => {
   const initials = getInitials(user.uid);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -89,6 +46,31 @@ const VideoTile = ({
     };
   }, [user.videoTrack]);
 
+  const getSizeClasses = (count: number) => {
+    if (count === 1) return 'text-[8vmin]';
+    if (count <= 4) return 'text-[6vmin]';
+    if (count <= 9) return 'text-[3vmin]';
+    return 'text-[2vmin]';
+  };
+
+  const getCircleSize = (count: number) => {
+    if (count === 1) return 'w-[9rem] h-[9rem]';
+    if (count <= 4) return 'w-[7rem] h-[7rem]';
+    if (count <= 9) return 'w-[5rem] h-[5rem]';
+    return 'w-[4rem] h-[4rem]';
+  };
+  const getNameSize = (count: number) => {
+    if (count === 1) return 'text-[1.5rem]';
+    if (count <= 4) return 'text-[1.2rem]';
+    if (count <= 9) return 'text-[1rem]';
+    return 'text-[0.8rem]';
+  };
+  const sizeClasses = getSizeClasses(userCount);
+  const circleSize = getCircleSize(userCount);
+  const nameSize = getNameSize(userCount);
+
+  // const sizeClasses = getSizeClasses(userCount);
+
   return (
     <div
       className={`relative ${size} bg-black rounded-lg overflow-hidden ${
@@ -102,13 +84,19 @@ const VideoTile = ({
             className="absolute inset-0 w-full h-full !object-contain scale-x-[-1]"
           />
         ) : (
-          <div className="w-24 sm:w-24 h-24 sm:h-24 rounded-full flex items-center justify-center bg-transparent border-2 border-green-500 text-white text-2xl sm:text-4xl font-bold">
-            {isLocal ? 'You' : initials}
+          <div
+            className={`${circleSize} aspect-square flex items-center justify-center`}
+          >
+            <div
+              className={`w-full h-full rounded-full flex items-center justify-center bg-transparent border-2 border-green-500 text-white font-bold ${sizeClasses}`}
+            >
+              {isLocal ? 'You' : initials}
+            </div>
           </div>
         )}
       </div>
       <div className="absolute w-full flex justify-center items-center bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent px-2 py-1">
-        <span className="text-white text-xs sm:text-[1.4rem] font-semibold">
+        <span className={`text-white font-semibold ${nameSize}`}>
           {isLocal ? 'You' : user.uid}
         </span>
       </div>
@@ -316,7 +304,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   }, [remoteUsers]);
   // const allUsers = useMemo(() => {
   //   // const localUser = { uid: 'You', videoTrack: localCameraTrack };
-  //   const dummyUsers = Array.from({ length: 13 }, (_, i) => ({
+  //   const dummyUsers = Array.from({ length: 6 }, (_, i) => ({
   //     uid: `User ${i + 1}`,
   //     videoTrack: null,
   //   }));
@@ -350,9 +338,15 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     if (userCount <= 4)
       return {
         containerClass:
-          'grid grid-cols-2 gap-[.1rem] max-w-5xl mx-auto h-full content-center  ',
+          'grid grid-cols-2 gap-[.1rem] max-w-7xl mx-auto h-full content-center  ',
         tileSize: `${baseClass} w-full`,
       };
+    // if (userCount <= 6)
+    //   return {
+    //     containerClass:
+    //       'grid grid-cols-2 gap-[.1rem] max-w-6xl mx-auto h-full content-center  ',
+    //     tileSize: `${baseClass} w-full`,
+    //   };
     if (userCount <= 9)
       return {
         containerClass:
@@ -385,6 +379,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
             size={tileSize}
             isLocal={false}
             isSpeaking={speakingUsers[user.uid] || false}
+            userCount={allUsers.length}
           />
         ))}
       </div>
