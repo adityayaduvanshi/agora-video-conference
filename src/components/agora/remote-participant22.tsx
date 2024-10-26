@@ -197,9 +197,9 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
 
         // Log when a user starts speaking
         if (isSpeaking) {
-          console.log(`${volume.uid} is speaking`);
+          console.log(`${volume.uid}spk`);
         } else {
-          console.log(`${volume.uid} is not speaking`);
+          console.log(`${volume.uid}nspk`);
         }
       });
       setSpeakingUsers(newSpeakingUsers);
@@ -240,11 +240,11 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         !user.uid.toLowerCase().includes('screendev')
       ) {
         await client.subscribe(user, mediaType);
-        console.log(
-          `${user.uid} turned on ${
-            mediaType === 'video' ? 'camera' : 'microphone'
-          }`
-        );
+        // console.log(
+        //   `${user.uid} turned on ${
+        //     mediaType === 'video' ? 'camera' : 'microphone'
+        //   }`
+        // );
         setRemoteUsers((prevUsers: any) => {
           const updatedUser = prevUsers.find(
             (u: any) => u.uid === user.uid
@@ -267,11 +267,11 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         !user.uid.toLowerCase().includes('vzone') &&
         !user.uid.toLowerCase().includes('screendev')
       ) {
-        console.log(
-          `${user.uid} turned off ${
-            mediaType === 'video' ? 'camera' : 'microphone'
-          }`
-        );
+        // console.log(
+        //   `${user.uid} turned off ${
+        //     mediaType === 'video' ? 'camera' : 'microphone'
+        //   }`
+        // );
 
         setRemoteUsers((prevUsers: any) =>
           prevUsers.map((u: any) =>
