@@ -102,13 +102,13 @@ const VideoTile = ({
             className="absolute inset-0 w-full h-full !object-contain scale-x-[-1]"
           />
         ) : (
-          <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-full flex items-center justify-center bg-transparent border-2 border-green-500 text-white text-2xl sm:text-4xl font-bold">
+          <div className="w-24 sm:w-24 h-24 sm:h-24 rounded-full flex items-center justify-center bg-transparent border-2 border-green-500 text-white text-2xl sm:text-4xl font-bold">
             {isLocal ? 'You' : initials}
           </div>
         )}
       </div>
       <div className="absolute w-full flex justify-center items-center bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent px-2 py-1">
-        <span className="text-white text-xs sm:text-sm">
+        <span className="text-white text-xs sm:text-lg font-semibold">
           {isLocal ? 'You' : user.uid}
         </span>
       </div>
@@ -310,18 +310,18 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   //   const localUser = { uid: 'You', videoTrack: localCameraTrack };
   //   return [localUser, ...remoteUsers];
   // }, [localCameraTrack, remoteUsers]);
-  const allUsers = useMemo(() => {
-    // Remove the local user, just return remoteUsers
-    return remoteUsers;
-  }, [remoteUsers]);
   // const allUsers = useMemo(() => {
-  //   // const localUser = { uid: 'You', videoTrack: localCameraTrack };
-  //   const dummyUsers = Array.from({ length: 9 }, (_, i) => ({
-  //     uid: `User ${i + 1}`,
-  //     videoTrack: null,
-  //   }));
-  //   return [...dummyUsers];
-  // }, []);
+  //   // Remove the local user, just return remoteUsers
+  //   return remoteUsers;
+  // }, [remoteUsers]);
+  const allUsers = useMemo(() => {
+    // const localUser = { uid: 'You', videoTrack: localCameraTrack };
+    const dummyUsers = Array.from({ length: 13 }, (_, i) => ({
+      uid: `User ${i + 1}`,
+      videoTrack: null,
+    }));
+    return [...dummyUsers];
+  }, []);
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * usersPerPage;
     return allUsers.slice(startIndex, startIndex + usersPerPage);
@@ -333,7 +333,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     if (userCount === 1)
       return {
         containerClass: 'flex items-center justify-center',
-        tileSize: `${baseClass} w-full max-w-5xl`,
+        tileSize: `${baseClass} w-full max-w-[70rem]`,
       };
     if (userCount === 2)
       return {
@@ -341,16 +341,22 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
           'grid grid-cols-1 justify-center sm:grid-cols-2 gap-2 h-full content-center',
         tileSize: `${baseClass} w-full`,
       };
+    if (userCount === 3)
+      return {
+        containerClass:
+          'grid grid-cols-2 gap-[0.1rem] max-w-[80rem] mx-auto h-full content-center  ',
+        tileSize: `${baseClass} w-full`,
+      };
     if (userCount <= 4)
       return {
         containerClass:
-          'grid grid-cols-2 gap-2 max-w-4xl mx-auto h-full content-center  ',
+          'grid grid-cols-2 gap-[.1rem] max-w-5xl mx-auto h-full content-center  ',
         tileSize: `${baseClass} w-full`,
       };
     if (userCount <= 9)
       return {
         containerClass:
-          'grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-5xl mx-auto h-full content-center',
+          'grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-6xl mx-auto h-full content-center',
         tileSize: `${baseClass} w-full`,
       };
     return {
@@ -370,7 +376,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-8rem)] sm:h-[calc(100vh-4rem)] p-2 overflow-hidden">
+    <div className="w-full h-full  p-2 overflow-hidden">
       <div className={`${containerClass} h-full`}>
         {paginatedUsers.map((user: any, index: any) => (
           <VideoTile

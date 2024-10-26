@@ -58,9 +58,6 @@ const Boardroom = () => {
 
   useClientEvent(client, 'connection-state-change', (state) => {
     console.log('Connection state changed:', state);
-    if (state === 'DISCONNECTED') {
-      localStorage.removeItem('active');
-    }
   });
 
   useClientEvent(client, 'user-joined', (user) => {
@@ -169,7 +166,7 @@ const Boardroom = () => {
             ))}
           </select>
         </div> */}
-        <div className="absolute top-4 right-4 z-10">
+        {/* <div className="absolute top-4 right-4 z-10">
           <div className="bg-gray-950 rounded-lg shadow-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <p className="text-white text-sm font-semibold">
@@ -202,7 +199,7 @@ const Boardroom = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* <LocalUserAudioTrack micOn={micOn} /> */}
       </div>
