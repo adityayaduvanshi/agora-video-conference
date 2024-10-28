@@ -221,6 +221,10 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         });
       }
     };
+
+    setInterval(() => {
+      console.clear();
+    }, 30000);
     const handleUserPublished = async (user: any, mediaType: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
@@ -304,7 +308,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   }, [remoteUsers]);
   // const allUsers = useMemo(() => {
   //   // const localUser = { uid: 'You', videoTrack: localCameraTrack };
-  //   const dummyUsers = Array.from({ length: 6 }, (_, i) => ({
+  //   const dummyUsers = Array.from({ length: 1 }, (_, i) => ({
   //     uid: `User ${i + 1}`,
   //     videoTrack: null,
   //   }));
@@ -321,7 +325,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     if (userCount === 1)
       return {
         containerClass: 'flex items-center justify-center',
-        tileSize: `${baseClass} w-full max-w-[70rem]`,
+        tileSize: `${baseClass} w-full max-w-[90vw]`,
       };
     if (userCount === 2)
       return {
