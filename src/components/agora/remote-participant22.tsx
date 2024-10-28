@@ -184,19 +184,22 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         newSpeakingUsers[volume.uid] = isSpeaking;
 
         // Log when a user starts speaking
-        //   if (isSpeaking) {
-        //     console.log(`${volume.uid}spk`);
-        //   } else {
-        //     console.log(`${volume.uid}nspk`);
-        //   }
-        // });
-        const user = remoteUsers.find((u) => u.uid === volume.uid);
-        if (user?.audioTrack && !isSpeaking) {
-          console.log(`${volume.uid}-nspk`);
-        } else if (isSpeaking) {
-          console.log(`${volume.uid}-spk`);
+        if (isSpeaking) {
+          console.log(`${volume.uid}spk`);
+        } else {
+          console.clear();
+          console.log(`${volume.uid}nspk`);
         }
       });
+      // const user = remoteUsers.find((u) => u.uid === volume.uid);
+
+      // console.log(user);
+      //   if (user?.audioTrack && !isSpeaking) {
+      //     console.log(`${volume.uid}-nspk`);
+      //   } else if (isSpeaking) {
+      //     console.log(`${volume.uid}-spk`);
+      //   }
+      // });
       setSpeakingUsers(newSpeakingUsers);
     };
 
@@ -229,9 +232,9 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
       }
     };
 
-    setInterval(() => {
-      console.clear();
-    }, 30000);
+    // setInterval(() => {
+    //   console.clear();
+    // }, 30000);
     const handleUserPublished = async (user: any, mediaType: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
