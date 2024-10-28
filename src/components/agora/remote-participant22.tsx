@@ -180,7 +180,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     const handleVolumeIndicator = (volumes: any) => {
       const newSpeakingUsers: any = {};
       volumes.forEach((volume: any) => {
-        const isSpeaking = volume.level > 60; // Adjust this threshold as needed
+        const isSpeaking = volume.level > 50; // Adjust this threshold as needed
         newSpeakingUsers[volume.uid] = isSpeaking;
 
         // Log when a user starts speaking
