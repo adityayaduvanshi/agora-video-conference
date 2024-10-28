@@ -184,10 +184,17 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
         newSpeakingUsers[volume.uid] = isSpeaking;
 
         // Log when a user starts speaking
-        if (isSpeaking) {
-          console.log(`${volume.uid}spk`);
-        } else {
+        //   if (isSpeaking) {
+        //     console.log(`${volume.uid}spk`);
+        //   } else {
+        //     console.log(`${volume.uid}nspk`);
+        //   }
+        // });
+        const user = remoteUsers.find((u) => u.uid === volume.uid);
+        if (user?.audioTrack && !isSpeaking) {
           console.log(`${volume.uid}nspk`);
+        } else if (isSpeaking) {
+          console.log(`${volume.uid}spk`);
         }
       });
       setSpeakingUsers(newSpeakingUsers);
