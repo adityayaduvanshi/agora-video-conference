@@ -232,9 +232,9 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
       }
     };
 
-    // setInterval(() => {
-    //   console.clear();
-    // }, 30000);
+    setInterval(() => {
+      console.clear();
+    }, 30000);
     const handleUserPublished = async (user: any, mediaType: any) => {
       if (
         !user.uid.toLowerCase().includes('screenshare') &&
@@ -318,7 +318,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   }, [remoteUsers]);
   // const allUsers = useMemo(() => {
   //   // const localUser = { uid: 'You', videoTrack: localCameraTrack };
-  //   const dummyUsers = Array.from({ length: 1 }, (_, i) => ({
+  //   const dummyUsers = Array.from({ length: 3 }, (_, i) => ({
   //     uid: `User ${i + 1}`,
   //     videoTrack: null,
   //   }));
@@ -345,14 +345,13 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
       };
     if (userCount === 3)
       return {
-        containerClass:
-          'grid grid-cols-2 gap-[0.1rem] max-w-[80rem] mx-auto h-full content-center  ',
+        containerClass: 'grid grid-cols-2 gap-[0.1rem]   mx-auto h-full  ',
         tileSize: `${baseClass} w-full`,
       };
     if (userCount <= 4)
       return {
         containerClass:
-          'grid grid-cols-2 gap-[.1rem] max-w-7xl mx-auto h-full content-center  ',
+          'grid grid-cols-2 gap-[.1rem] max-w-8xl mx-auto h-full content-center  ',
         tileSize: `${baseClass} w-full`,
       };
     // if (userCount <= 6)
@@ -384,7 +383,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
   };
 
   return (
-    <div className="w-full h-full  p-2 overflow-hidden">
+    <div className="w-full h-full  p-4 overflow-hidden">
       <div className={`${containerClass} h-full`}>
         {paginatedUsers.map((user: any, index: any) => (
           <VideoTile
