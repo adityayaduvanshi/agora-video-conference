@@ -363,7 +363,7 @@ const RemoteParticipants = ({ channel }: { channel: any }) => {
     if (userCount <= 9)
       return {
         containerClass:
-          'grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-6xl mx-auto h-full content-center',
+          'grid grid-cols-2 sm:grid-cols-3 gap-2  mx-auto h-full content-center',
         tileSize: `${baseClass} w-full`,
       };
     return {
