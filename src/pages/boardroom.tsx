@@ -49,7 +49,7 @@ const Boardroom = () => {
       appid: process.env.REACT_APP_AGORAID!,
       channel: currentChannel,
       token: null,
-      uid: agoraUid,
+      uid:  `${agoraUid}-vZone`,
     },
     calling
   );
