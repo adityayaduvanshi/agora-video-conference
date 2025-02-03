@@ -7,20 +7,19 @@ interface UserState {
 }
 
 export const useUserStore = create<UserState>()((set) => ({
-  username: '',
-  setUsername: (username: string) => set({ username }),
+  username: sessionStorage.getItem('username') || '',
+  setUsername: (username: string) => {
+    sessionStorage.setItem('username', username);
+    set({ username });
+  },
   logout: () => {
+    sessionStorage.removeItem('username');
     set({ username: '' });
-    localStorage.removeItem('username');
-    localStorage.removeItem('usernameExpiration');
   },
 }));
 
 export const storeUsername = (username: string) => {
   useUserStore.getState().setUsername(username);
-  const expirationTime = new Date().getTime() + 2 * 60 * 60 * 1000; // 2 hours from now
-  localStorage.setItem('username', username);
-  localStorage.setItem('usernameExpiration', expirationTime.toString());
 };
 
 export const loadUsername = () => {
